@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+
+	"prideflag.fun/src/pages"
 )
 
 func main() {
@@ -13,6 +15,8 @@ func main() {
 
 	flag.IntVar(port, "p", 3000, "Specifies the network port the application will use.")
 	flag.Parse()
+
+	http.HandleFunc("/", pages.Index)
 
 	fmt.Printf("The HTTP server now runs on 0.0.0.0:%d\n", *port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
