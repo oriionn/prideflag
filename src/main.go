@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"flag"
 	"fmt"
 	"net/http"
@@ -8,7 +9,12 @@ import (
 	"prideflag.fun/src/pages"
 )
 
+//go:embed public/*
+var public embed.FS
+
 func main() {
+	InitDatabase()
+
 	var (
 		port = flag.Int("port", 3000, "Specifies the network port the application will use.")
 	)
@@ -17,6 +23,9 @@ func main() {
 	flag.Parse()
 
 	http.HandleFunc("/", pages.Index)
+
+	fileServer := http.FileServer(http.FS(public))
+	http.Handle("/public/", fileServer)
 
 	fmt.Printf("The HTTP server now runs on 0.0.0.0:%d\n", *port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
