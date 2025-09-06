@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Prideflag Test - Results</title>
+
+	<link rel="stylesheet" href="/public/styles/result.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Note: {{.Test.Note}} / {{.Max}}</h2>
+        <span>{{.Message}}</span>
+        <button onclick="window.location.href='/test?restart'">Restart a test</button>
+    </div>
+</body>
+</html>

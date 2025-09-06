@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"errors"
+	"fmt"
 	"html/template"
 	"net/http"
 	"slices"
@@ -13,7 +14,6 @@ import (
 	"gorm.io/gorm"
 	"prideflag.fun/src/data"
 	"prideflag.fun/src/database"
-	"prideflag.fun/src/utils"
 )
 
 //go:embed templates/test.html
@@ -23,11 +23,13 @@ type TestPageData struct {
 	Choices [4]database.Choices
 	Flag    uint
 	Test    database.Test
+	Max     int
 }
 
 func Test(db *gorm.DB, ctx context.Context) http.HandlerFunc {
 	return func (w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("current_test")
+		query := r.URL.Query()
 		hasTestCookie := err == nil
 
 		if hasTestCookie {
@@ -37,7 +39,7 @@ func Test(db *gorm.DB, ctx context.Context) http.HandlerFunc {
 			}
 		}
 
-		if !hasTestCookie {
+		if !hasTestCookie || query.Has("restart") {
 			newTest := &database.Test{}
 
 			err := gorm.G[database.Test](db).Create(ctx, newTest)
@@ -56,11 +58,21 @@ func Test(db *gorm.DB, ctx context.Context) http.HandlerFunc {
 
 			http.SetCookie(w, cookie)
 			RollChoices(newTest.ID, db, ctx)
+
+			if query.Has("restart") {
+				http.Redirect(w, r, "/test", 307)
+				return
+			}
 		}
 
 		test, err := gorm.G[database.Test](db).Where("id = ?", cookie.Value).First(ctx)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if test.Total >= len(data.DATASET) {
+			http.Redirect(w, r, fmt.Sprintf("/results?t=%d", test.ID), 307)
 			return
 		}
 
@@ -75,7 +87,6 @@ func Test(db *gorm.DB, ctx context.Context) http.HandlerFunc {
 			validChoicesID = append(validChoicesID, choice.ID)
 		}
 
-		query := r.URL.Query()
 		if query.Has("a") {
 			answer := query.Get("a")
 			answerInt, err := strconv.Atoi(answer)
@@ -115,6 +126,7 @@ func Test(db *gorm.DB, ctx context.Context) http.HandlerFunc {
 			Choices: [4]database.Choices(choices),
 			Flag: flag.ID,
 			Test: test,
+			Max: len(data.DATASET),
 		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -129,19 +141,13 @@ func RollChoices(test_id uint, db *gorm.DB, ctx context.Context) {
 		flagExists = append(flagExists, flag.Flag)
 	}
 
-	choices, err := data.GetChoices(flagExists)
+	choices, trueFlag, err := data.GetChoices(flagExists)
 	if err != nil {
 		RollChoices(test_id, db, ctx)
 		return
 	}
 
-	trueFlag, err := utils.RandomInt(4)
-	if err != nil {
-		RollChoices(test_id, db, ctx)
-		return
-	}
-
-	gorm.G[database.Choices](db).Where("test_id = ?", test_id).Delete(ctx)
+	db.Unscoped().Where("test_id = ?", test_id).Delete(&database.Choices{})
 	gorm.G[database.FlagInTheTest](db).Create(ctx, &database.FlagInTheTest{
 		TestID: test_id,
 		Flag: choices[trueFlag].File,

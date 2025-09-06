@@ -3,14 +3,14 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Prideflag Test</title>
+	<title>Prideflag Test - {{.Test.Total}}/{{.Max}}</title>
 
 	<link rel="stylesheet" href="/public/styles/test.css">
 	<script src="/public/scripts/test.js" defer></script>
 </head>
 <body>
     <div class="container">
-        <h2>{{.Test.Total}} / 10 questions</h2>
+        <h2>{{.Test.Total}} / {{.Max}} questions</h2>
         <img src="/flag?f={{.Flag}}" class="flag" />
         <div class="choices">
             {{range .Choices}}

@@ -6,25 +6,30 @@ import (
 	"prideflag.fun/src/utils"
 )
 
-func GetChoices(flagsExists []string) ([4]Data, error) {
+func GetChoices(flagsExists []string) ([4]Data, int, error) {
 	data := [4]Data{}
 	names := []string{}
 	length := int64(len(DATASET))
 
+	trueChoice, err := utils.RandomInt(4)
+	if err != nil {
+		return data, 0, err
+	}
+
 	for i := range data {
-		choice, err := GetChoice(names, length, flagsExists, 10)
+		choice, err := GetChoice(names, length, flagsExists, 40, i == int(trueChoice))
 		if err != nil {
-			return data, err
+			return data, 0, err
 		}
 
 		data[i] = choice
 		names = append(names, choice.Name)
 	}
 
-	return data, nil
+	return data, int(trueChoice), nil
 }
 
-func GetChoice(names []string, length int64, flagsExists []string, maxAttempts int) (Data, error) {
+func GetChoice(names []string, length int64, flagsExists []string, maxAttempts int, isTrueChoice bool) (Data, error) {
 	n, err := utils.RandomInt(length)
 	if err != nil {
 		return Data{}, err
@@ -35,8 +40,8 @@ func GetChoice(names []string, length int64, flagsExists []string, maxAttempts i
 		return choice, nil
 	}
 
-	if slices.Contains(names, choice.Name) || slices.Contains(flagsExists, choice.File) {
-		return GetChoice(names, length, flagsExists, maxAttempts - 1)
+	if slices.Contains(names, choice.Name) || (slices.Contains(flagsExists, choice.File) && isTrueChoice) {
+		return GetChoice(names, length, flagsExists, maxAttempts - 1, isTrueChoice)
 	}
 
 	return choice, nil

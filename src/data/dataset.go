@@ -34,7 +34,7 @@ var DATASET = []Data{
 		File: "pansexual.png",
 	},
 	{
-		Name: "Omnisexaul",
+		Name: "Omnisexual",
 		File: "omnisexual.png",
 	},
 	{
