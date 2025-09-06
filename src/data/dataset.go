@@ -58,8 +58,8 @@ var DATASET = []Data{
 		File: "asexual.png",
 	},
 	{
-		Name: "bigender",
-		File: "bigender.png",
+		Name: "Bigender",
+		File: "bigender.svg",
 	},
 	{
 		Name: "Genderfluid",
