@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"prideflag.fun/src/database"
 	"prideflag.fun/src/pages"
 )
 
@@ -13,7 +14,7 @@ import (
 var public embed.FS
 
 func main() {
-	InitDatabase()
+	db, ctx := database.InitDatabase()
 
 	var (
 		port = flag.Int("port", 3000, "Specifies the network port the application will use.")
@@ -23,6 +24,7 @@ func main() {
 	flag.Parse()
 
 	http.HandleFunc("/", pages.Index)
+	http.HandleFunc("/test", pages.Test(db, ctx))
 
 	fileServer := http.FileServer(http.FS(public))
 	http.Handle("/public/", fileServer)

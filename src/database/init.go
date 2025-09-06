@@ -1,21 +1,22 @@
-package main
+package database
 
 import (
+	"context"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-type Test struct {
-	gorm.Model
-	ID   uint  `gorm:"primaryKey;autoIncrement;column:id"`
-	Note int   `gorm:"column:note;not null"`
-}
-
-func InitDatabase() {
+func InitDatabase() (*gorm.DB, context.Context) {
 	db, err := gorm.Open(sqlite.Open("prideflag.sqlite"), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
 
+	ctx := context.Background()
 	db.AutoMigrate(&Test{})
+	db.AutoMigrate(&Images{})
+	db.AutoMigrate(&Choices{})
+
+	return db, ctx
 }

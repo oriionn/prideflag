@@ -1,0 +1,19 @@
+@import url(/public/styles/globals.css);
+
+.flag {
+    width: 400px;
+}
+
+.choices {
+    margin-top: 20px;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+}
+
+.choices button {
+    width: 100%;
+}
