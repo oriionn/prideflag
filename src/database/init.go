@@ -17,6 +17,7 @@ func InitDatabase() (*gorm.DB, context.Context) {
 	db.AutoMigrate(&Test{})
 	db.AutoMigrate(&Images{})
 	db.AutoMigrate(&Choices{})
+	db.AutoMigrate(&FlagInTheTest{})
 
 	return db, ctx
 }

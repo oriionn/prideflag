@@ -23,3 +23,9 @@ type Images struct {
 	ID   uint   `gorm:"primaryKey;autoIncrement;column:id"`
 	File string `gorm:"column:file;not null"`
 }
+
+type FlagInTheTest struct {
+	gorm.Model
+	TestID uint `gorm:"column:test_id;not null"`
+	Flag string `gorm:"colunm:flag;not null"`
+}
