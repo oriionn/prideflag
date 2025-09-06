@@ -1,7 +1,7 @@
 # prideflag.fun
 A simple test about pride flags !!
 
-## Installation
+## Installation (Standalone)
 ### Prerequisites
 - `Golang`
 
@@ -23,7 +23,6 @@ make
 ```
 
 ## CLI Params
-Pour personnaliser le comportement du programme, le programme comporte plusieurs paramètres CLI, en voici une liste : 
-- `--port` / `-p` : Pour changer le port de votre programme
-- `--database` / `-d` : Pour changer le chemin de votre base de donnée SQLite
-
+To customize program behavior, the program includes several CLI parameters, listed below:
+- `--port` / `-p`: To change your program's port
+- `--database` / `-d` : To change the path of your SQLite database

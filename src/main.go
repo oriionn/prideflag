@@ -14,14 +14,16 @@ import (
 var public embed.FS
 
 func main() {
-	db, ctx := database.InitDatabase()
-
 	var (
 		port = flag.Int("port", 3000, "Specifies the network port the application will use.")
+		databasePath = flag.String("database", "prideflag.sqlite", "Change the path of your database.")
 	)
 
 	flag.IntVar(port, "p", 3000, "Specifies the network port the application will use.")
+	flag.StringVar(databasePath, "d", "prideflag.sqlite", "Change the path of your database.")
 	flag.Parse()
+
+	db, ctx := database.InitDatabase(*databasePath)
 
 	http.HandleFunc("/", pages.Index)
 	http.HandleFunc("/test", pages.Test(db, ctx))
