@@ -10,7 +10,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o prideflag main.go
+RUN go build -o prideflag src/main.go
 
 # Final
 FROM alpine:latest
