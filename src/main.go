@@ -25,6 +25,7 @@ func main() {
 
 	http.HandleFunc("/", pages.Index)
 	http.HandleFunc("/test", pages.Test(db, ctx))
+	http.HandleFunc("/flag", pages.Flag(db, ctx, public))
 
 	fileServer := http.FileServer(http.FS(public))
 	http.Handle("/public/", fileServer)

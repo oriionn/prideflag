@@ -3,7 +3,8 @@ package pages
 import (
 	"context"
 	_ "embed"
-	"io"
+	"errors"
+	"html/template"
 	"net/http"
 	"strconv"
 	"time"
@@ -16,6 +17,11 @@ import (
 
 //go:embed templates/test.html
 var testContent string
+
+type TestPageData struct {
+	Choices [4]database.Choices
+	Flag    uint
+}
 
 func Test(db *gorm.DB, ctx context.Context) http.HandlerFunc {
 	return func (w http.ResponseWriter, r *http.Request) {
@@ -30,9 +36,7 @@ func Test(db *gorm.DB, ctx context.Context) http.HandlerFunc {
 		}
 
 		if !hasTestCookie {
-			newTest := &database.Test{
-				Answer: 1,
-			}
+			newTest := &database.Test{}
 
 			err := gorm.G[database.Test](db).Create(ctx, newTest)
 			if err != nil {
@@ -58,6 +62,12 @@ func Test(db *gorm.DB, ctx context.Context) http.HandlerFunc {
 			return
 		}
 
+		choices, trueChoice, err := GetChoices(test.ID, db, ctx)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		query := r.URL.Query()
 		if query.Has("a") {
 			answer := query.Get("a")
@@ -66,34 +76,40 @@ func Test(db *gorm.DB, ctx context.Context) http.HandlerFunc {
 				http.Redirect(w, r, "/", 302)
 			}
 
-			if test.Answer == answerInt {
+			if int(trueChoice.ID) == answerInt {
 				test.Note += 1
 			}
 			test.Total += 1
 
 			RollChoices(test.ID, db, ctx)
+
+			choices, trueChoice, err = GetChoices(test.ID, db, ctx)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		}
 
-		choices, err := gorm.G[database.Choices](db).Where("test_id = ?", test.ID).Find(ctx)
+		flag := database.Images{
+			File: trueChoice.File,
+		}
+
+		gorm.G[database.Images](db).Create(ctx, &flag)
+
+		// Templating
+		t, err := template.New("test").Parse(testContent)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		var trueChoice database.Choices = database.Choices{Name: ""};
-		for _, choice := range choices {
-			if choice.TrueFlag == true {
-				trueChoice = choice
-			}
-		}
-
-		if trueChoice.Name == "" {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
+		data := TestPageData{
+			Choices: [4]database.Choices(choices),
+			Flag: flag.ID,
 		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		io.WriteString(w, testContent)
+		t.Execute(w, data)
 	}
 }
 
@@ -121,4 +137,24 @@ func RollChoices(test_id uint, db *gorm.DB, ctx context.Context) {
 		}
 		gorm.G[database.Choices](db).Create(ctx, &choiceData)
 	}
+}
+
+func GetChoices(test_id uint, db *gorm.DB, ctx context.Context) ([]database.Choices, database.Choices, error) {
+	choices, err := gorm.G[database.Choices](db).Where("test_id = ?", test_id).Find(ctx)
+	if err != nil {
+		return nil, database.Choices{}, err
+	}
+
+	var trueChoice database.Choices = database.Choices{Name: ""};
+	for _, choice := range choices {
+		if choice.TrueFlag == true {
+			trueChoice = choice
+		}
+	}
+
+	if trueChoice.Name == "" {
+		return nil, database.Choices{}, errors.New("Internal Server Error")
+	}
+
+	return choices, trueChoice, nil
 }

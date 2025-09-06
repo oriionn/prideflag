@@ -7,7 +7,6 @@ type Test struct {
 	ID     uint   `gorm:"primaryKey;autoIncrement;column:id"`
 	Note   int    `gorm:"column:note;not null;default:0"`
 	Total  int    `gorm:"column:total;not null;default:0"`
-	Answer int    `gorm:"column:answer;not null"`
 }
 
 type Choices struct {

@@ -9,12 +9,11 @@
 </head>
 <body>
     <div class="container">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Bisexual_Pride_Flag.svg" class="flag" />
+        <img src="/flag?f={{.Flag}}" class="flag" />
         <div class="choices">
-            <button data-choice="1">Gay</button>
-            <button data-choice="2">Transgender</button>
-            <button data-choice="3">Bisexual</button>
-            <button data-choice="4">Non binary</button>
+            {{range .Choices}}
+                <button data-choice="{{.ID}}">{{.Name}}</button>
+            {{end}}
         </div>
     </div>
 </body>
