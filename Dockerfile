@@ -26,5 +26,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV DATABASE=data/prideflag.sqlite
 
-# On traduit les env vars en flags pour ton binaire
-ENTRYPOINT ["./prideflag", "-p ${PORT}" "-d ${DATABASE}"]
+ENTRYPOINT ./prideflag -p ${PORT} -d ${DATABASE}
