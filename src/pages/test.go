@@ -56,7 +56,16 @@ func Test(db *gorm.DB, ctx context.Context) http.HandlerFunc {
 				SameSite: http.SameSiteStrictMode,
 			}
 
+			secondCookie := &http.Cookie{
+				Name: "finished",
+				Value: "false",
+				Expires: time.Now().Add(48 * time.Hour),
+				Path: "/",
+				SameSite: http.SameSiteStrictMode,
+			}
+
 			http.SetCookie(w, cookie)
+			http.SetCookie(w, secondCookie)
 			RollChoices(newTest.ID, db, ctx)
 
 			if query.Has("restart") {
@@ -72,6 +81,15 @@ func Test(db *gorm.DB, ctx context.Context) http.HandlerFunc {
 		}
 
 		if test.Total >= len(data.DATASET) {
+			secondCookie := &http.Cookie{
+				Name: "finished",
+				Value: "true",
+				Expires: time.Now().Add(48 * time.Hour),
+				Path: "/",
+				SameSite: http.SameSiteStrictMode,
+			}
+
+			http.SetCookie(w, secondCookie)
 			http.Redirect(w, r, fmt.Sprintf("/results?t=%d", test.ID), 307)
 			return
 		}

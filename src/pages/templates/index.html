@@ -11,7 +11,14 @@
     <div class="container">
         <h1>Prideflag Quiz</h1>
         <span>Test your knowledge about LGBTQIA+ flags !</span>
-        <button onclick="window.location.href='/test';">Start the test</button>
+        <div class="buttons">
+            {{if .IsFinished}}
+                <button onclick="window.location.href='/test';">Start the test</button>
+            {{else}}
+                <button onclick="window.location.href='/test';">Continue your test</button>
+                <button onclick="window.location.href='/test?restart';">Restart a test</button>
+            {{end}}
+        </div>
     </div>
 </body>
 </html>
