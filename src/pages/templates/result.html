@@ -11,7 +11,10 @@
     <div class="container">
         <h2>Note: {{.Test.Note}} / {{.Max}}</h2>
         <span>{{.Message}}</span>
-        <button onclick="window.location.href='/test?restart'">Restart a test</button>
+        <div class="buttons">
+             <button onclick="window.location.href='/test?restart'">Restart a test</button>
+             <button onclick="navigator.share({ title: 'My results on prideflag.fun !', description: 'I got {{.Test.Note}}/{{.Max}}.', url: 'https://prideflag.fun/results?t={{.Test.ID}}' })">Share your results</button>
+        </div>
     </div>
 </body>
 </html>
