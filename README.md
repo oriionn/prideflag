@@ -34,9 +34,6 @@ cd prideflag
 ```
 
 2. Edit the `docker-compose.yml` like you want
-```sh
-make
-```
 
 3. Run with docker compose
 ```sh

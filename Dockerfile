@@ -21,8 +21,6 @@ WORKDIR /app
 
 COPY --from=builder /app/prideflag .
 
-COPY public ./public
-
 EXPOSE 3000
 
 ENV PORT=3000
