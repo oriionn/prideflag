@@ -37,7 +37,7 @@ func Result(db *gorm.DB, ctx context.Context) http.HandlerFunc {
 
 		message := "You can do better!"
 		if test.Note >= len(data.DATASET) - 2 {
-			message = "You are a fucking true faggot :3"
+			message = "You are a fucking real faggot :3"
 		} else if test.Note >= len(data.DATASET) / 2 {
 			message = "Good job!"
 		} else if test.Note <= 2 {
